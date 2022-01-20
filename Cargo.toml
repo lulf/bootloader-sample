@@ -1,0 +1,78 @@
+[package]
+name = "bootloader"
+authors = ["Dario Nieuwenhuis <dirbaio@dirbaio.net>"]
+version = "0.1.0"
+edition = "2018"
+readme = "README.md"
+
+[dependencies]
+uzlib = { path = "uzlib" }
+
+defmt = { version = "0.3", optional = true }
+rzcobs = { version = "0.1.2", default-features = false }
+
+nrf-softdevice-mbr = "0.1.1"
+cortex-m = { version = "0.7.3", features = ["inline-asm"]}
+cortex-m-rt = { version = "0.7.0" }
+embassy = { version = "0.1.0", features = []}
+embassy-traits = { version = "0.1.0", features = []}
+embassy-nrf = { version = "0.1.0", features = ["nrf52840", "unstable-pac"] }
+embedded-hal = "0.2.5"
+hex-literal = { version = "0.3.1", default-features = false, features = []}
+critical-section = "0.2.1"
+embedded-storage = "0.2.0"
+
+[features]
+defmt = [
+    "dep:defmt",
+    "embassy/defmt",
+    "embassy-nrf/defmt",
+    "embassy-traits/defmt",
+]
+
+[[bin]]
+name = "bootloader"
+path = "src/main.rs"
+
+[patch.crates-io]
+defmt = { git = "https://github.com/knurling-rs/defmt/" }
+nrf-softdevice-mbr = { git = "https://github.com/embassy-rs/nrf-softdevice" }
+embassy = { git = "https://github.com/embassy-rs/embassy" }
+embassy-nrf = { git = "https://github.com/embassy-rs/embassy" }
+embassy-macros = { git = "https://github.com/embassy-rs/embassy" }
+embassy-traits = { git = "https://github.com/embassy-rs/embassy" }
+
+#embassy = { path = "../../../embassy/embassy/embassy" }
+#embassy-nrf = { path = "../../../embassy/embassy/embassy-nrf" }
+#embassy-macros = { path = "../../../embassy/embassy/embassy-macros" }
+#embassy-traits = { path = "../../../embassy/embassy/embassy-traits" }
+
+[profile.dev]
+debug = 2
+debug-assertions = true
+opt-level = 's'
+overflow-checks = true
+
+[profile.release]
+codegen-units = 1
+debug = 2
+debug-assertions = false
+incremental = false
+lto = 'fat'
+opt-level = 'z'
+overflow-checks = false
+
+# do not optimize proc-macro crates = faster builds from scratch
+[profile.dev.build-override]
+codegen-units = 8
+debug = false
+debug-assertions = false
+opt-level = 0
+overflow-checks = false
+
+[profile.release.build-override]
+codegen-units = 8
+debug = false
+debug-assertions = false
+opt-level = 0
+overflow-checks = false
